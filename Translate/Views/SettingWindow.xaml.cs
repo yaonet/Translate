@@ -21,7 +21,7 @@ public sealed partial class SettingWindow : Window
         var hwnd = WindowNative.GetWindowHandle(this);
         var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
         var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
-        appWindow.Resize(new Windows.Graphics.SizeInt32(600, 500));
+        appWindow.Resize(new Windows.Graphics.SizeInt32(1000, 800));
 
         // Select the first item by default
         NavView.SelectedItem = NavView.MenuItems[0];
@@ -38,8 +38,11 @@ public sealed partial class SettingWindow : Window
                 case "General":
                     ContentFrame.Navigate(typeof(GeneralSettingsPage));
                     break;
-                case "TranslationServices":
-                    ContentFrame.Navigate(typeof(TranslationServicesPage));
+                case "Gemini":
+                    ContentFrame.Navigate(typeof(GeminiSettingsPage));
+                    break;
+                case "Ollama":
+                    ContentFrame.Navigate(typeof(OllamaSettingsPage));
                     break;
                 case "About":
                     ContentFrame.Navigate(typeof(AboutPage));

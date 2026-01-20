@@ -42,10 +42,22 @@
                         <FontIcon Glyph="&#xE770;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="翻译服务" Tag="TranslationServices">
+                <NavigationViewItem Content="翻译服务" SelectsOnInvoked="False">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xF2B7;"/>
                     </NavigationViewItem.Icon>
+                    <NavigationViewItem.MenuItems>
+                        <NavigationViewItem Content="Gemini" Tag="Gemini">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xE943;"/>
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="Ollama" Tag="Ollama">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xE99A;"/>
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                    </NavigationViewItem.MenuItems>
                 </NavigationViewItem>
             </NavigationView.MenuItems>
             
