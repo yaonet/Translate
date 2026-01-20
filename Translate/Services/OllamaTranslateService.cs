@@ -14,18 +14,14 @@ namespace Translate.Services
     public class OllamaTranslateService : ITranslateService
     {
         private readonly HttpClient _http;
-        private readonly string _baseUrl;
-        private readonly string _model;
-
+        private readonly SettingsService _settings;
         public string Name => "Ollama";
 
-        public OllamaTranslateService(HttpClient httpClient, string baseUrl = "http://localhost:11434", string model = "translategemma")
+        public OllamaTranslateService(HttpClient httpClient, SettingsService settings)
         {
             _http = httpClient;
-            _baseUrl = baseUrl;
-            _model = model;
+            _settings = settings;
         }
-
         public async Task<TranslationResult> TranslateAsync(TranslationRequest request, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(request.Text))
@@ -44,7 +40,7 @@ namespace Translate.Services
 
                 var body = new
                 {
-                    model = _model,
+                    model = _settings.OllamaModel,
                     prompt = prompt!,
                     stream = false
                 };
@@ -52,7 +48,7 @@ namespace Translate.Services
                 var json = JsonSerializer.Serialize(body);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                using var response = await _http.PostAsync($"{_baseUrl}/api/generate", content, cancellationToken);
+                using var response = await _http.PostAsync($"{_settings.OllamaBaseUrl}/api/generate", content, cancellationToken);
                 if (!response.IsSuccessStatusCode)
                 {
                     return new TranslationResult(false, null, $"Translation failed: {response.StatusCode}");

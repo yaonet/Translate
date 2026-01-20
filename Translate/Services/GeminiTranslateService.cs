@@ -14,18 +14,14 @@ namespace Translate.Services
     public class GeminiTranslateService : ITranslateService
     {
         private readonly HttpClient _http;
-        private readonly string _apiKey;
-        private readonly string _model;
-
+        private readonly SettingsService _settings;
         public string Name => "Gemini";
 
-        public GeminiTranslateService(HttpClient httpClient, string apiKey = "AIzaSyBif3LKWaWMPH5WuugLgseJ8utobzNf1Ps", string model = "gemini-flash-latest")
+        public GeminiTranslateService(HttpClient httpClient, SettingsService settings)
         {
             _http = httpClient;
-            _apiKey = apiKey;
-            _model = model;
+            _settings = settings;
         }
-
         public async Task<TranslationResult> TranslateAsync(TranslationRequest request, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(request.Text))
@@ -33,7 +29,7 @@ namespace Translate.Services
                 return new TranslationResult(false, null, "Please enter text to translate.");
             }
 
-            if (string.IsNullOrWhiteSpace(_apiKey))
+            if (string.IsNullOrWhiteSpace(_settings.GeminiApiKey))
             {
                 return new TranslationResult(false, null, "Gemini API key is not configured.");
             }
@@ -64,7 +60,7 @@ namespace Translate.Services
                 var json = JsonSerializer.Serialize(body);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var url = $"https://generativelanguage.googleapis.com/v1beta/models/{_model}:generateContent?key={_apiKey}";
+                var url = $"https://generativelanguage.googleapis.com/v1beta/models/{_settings.GeminiModel}:generateContent?key={_settings.GeminiApiKey}";
                 using var response = await _http.PostAsync(url, content, cancellationToken);
 
                 if (!response.IsSuccessStatusCode)

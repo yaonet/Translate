@@ -127,8 +127,6 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(ThemeGlyph));
     }
 
-    //为什么不使用IDisposable ？
-    //viewModel由依赖注入管理，还需要手动释放吗？
     public void Cleanup()
     {
         if (_textSelectionService != null)

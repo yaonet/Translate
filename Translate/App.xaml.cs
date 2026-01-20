@@ -32,6 +32,7 @@ namespace Translate
 
             // Services
             services.AddSingleton<HttpClient>();
+            services.AddSingleton<SettingsService>();
             services.AddSingleton(new TextSelectionService());
 
             // Keyed translate services
