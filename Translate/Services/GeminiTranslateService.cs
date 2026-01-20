@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Translate.Helpers;
 
 namespace Translate.Services
 {
@@ -12,13 +13,6 @@ namespace Translate.Services
     /// </summary>
     public class GeminiTranslateService : ITranslateService
     {
-        private const string PromptTemplate =
-            "You are a professional {SOURCE_LANG} ({SOURCE_CODE}) to {TARGET_LANG} ({TARGET_CODE}) translator. " +
-            "Your goal is to accurately convey the meaning and nuances of the original {SOURCE_LANG} text " +
-            "while adhering to {TARGET_LANG} grammar, vocabulary, and cultural sensitivities. " +
-            "Produce only the {TARGET_LANG} translation, without any additional explanations or commentary. " +
-            "Please translate the following {SOURCE_LANG} text into {TARGET_LANG}:\n\n{TEXT}";
-
         private readonly HttpClient _http;
         private readonly string _apiKey;
         private readonly string _model;
@@ -46,13 +40,10 @@ namespace Translate.Services
 
             try
             {
-                string sourceLanguage = CodeToLanguage(request.SourceLanguageCode);
-                string targetLanguage = CodeToLanguage(request.TargetLanguageCode);
-
-                string prompt = PromptTemplate
-                    .Replace("{SOURCE_LANG}", sourceLanguage)
+                string prompt = LanguageHelper.PromptTemplate
+                    .Replace("{SOURCE_LANG}", LanguageHelper.CodeToLanguage(request.SourceLanguageCode))
                     .Replace("{SOURCE_CODE}", request.SourceLanguageCode)
-                    .Replace("{TARGET_LANG}", targetLanguage)
+                    .Replace("{TARGET_LANG}", LanguageHelper.CodeToLanguage(request.TargetLanguageCode))
                     .Replace("{TARGET_CODE}", request.TargetLanguageCode)
                     .Replace("{TEXT}", request.Text);
 
@@ -121,18 +112,6 @@ namespace Translate.Services
             {
                 return new TranslationResult(false, null, $"Error: {ex.Message}");
             }
-        }
-
-        private static string CodeToLanguage(string code)
-        {
-            return code switch
-            {
-                "en" => "English",
-                "zh" => "Chinese",
-                "ja" => "Japanese",
-                "ko" => "Korean",
-                _ => code
-            };
         }
     }
 }

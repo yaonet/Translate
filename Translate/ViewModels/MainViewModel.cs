@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
+using Translate.Helpers;
 using Translate.Services;
 
 namespace Translate.ViewModels;
@@ -69,7 +70,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     public partial string TargetCode { get; set; } = "zh";
 
-    public string[] Code { get; } = ["zh", "en", "ja", "ko"];
+    public string[] Code => LanguageHelper.LanguageCodes;
     partial void OnIsAutoTranslateChanged(bool value)
     {
         if (value)
