@@ -20,7 +20,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    public partial bool IsAutoTranslateEnabled { get; set; }
+    public partial bool IsAutoTranslate { get; set; }
 
     [ObservableProperty]
     public partial bool IsAlwaysOnTop { get; set; } = true;
@@ -50,15 +50,13 @@ public partial class MainViewModel : ObservableObject
     public partial string TargetCode { get; set; } = "zh";
 
     public string[] Code { get; } = ["zh", "en", "ja", "ko"];
-
-    partial void OnIsAutoTranslateEnabledChanged(bool value)
+    partial void OnIsAutoTranslateChanged(bool value)
     {
         if (value)
             _textSelectionService?.Start();
         else
             _textSelectionService?.Stop();
     }
-
     private async void OnTextSelected(string text)
     {
         SourceText = text;

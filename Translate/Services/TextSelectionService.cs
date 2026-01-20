@@ -18,7 +18,7 @@ namespace Translate.Services
         private string _previousClipboardText = string.Empty;
         private DateTime _lastClickTime = DateTime.MinValue;
         private System.Drawing.Point _lastClickPos;
-        private readonly DispatcherQueue? _dispatcherQueue;
+        private DispatcherQueue? _dispatcherQueue;
 
         private const int DoubleClickTime = 500;
         private const int DoubleClickDistance = 4;
@@ -29,6 +29,14 @@ namespace Translate.Services
         public event Action<string>? TextSelected;
 
         public TextSelectionService(DispatcherQueue? dispatcherQueue = null)
+        {
+            _dispatcherQueue = dispatcherQueue;
+        }
+
+        /// <summary>
+        /// Set the DispatcherQueue for UI thread marshalling (delayed injection).
+        /// </summary>
+        public void SetDispatcherQueue(DispatcherQueue dispatcherQueue)
         {
             _dispatcherQueue = dispatcherQueue;
         }

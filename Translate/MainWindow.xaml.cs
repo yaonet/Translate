@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Translate.Services;
 using Translate.ViewModels;
 using System.ComponentModel;
 
@@ -13,6 +14,10 @@ namespace Translate
         {
             InitializeComponent();
             _viewModel = App.Current.Services.GetRequiredService<MainViewModel>();
+
+            // Inject DispatcherQueue for UI thread marshalling
+            var textSelectionService = App.Current.Services.GetRequiredService<TextSelectionService>();
+            textSelectionService.SetDispatcherQueue(DispatcherQueue);
 
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(AppTitleBar);
