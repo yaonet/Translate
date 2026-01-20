@@ -49,6 +49,7 @@ namespace Translate
 
             // ViewModels
             services.AddTransient<MainViewModel>();
+            services.AddTransient<SettingViewModel>();
 
             return services.BuildServiceProvider();
         }

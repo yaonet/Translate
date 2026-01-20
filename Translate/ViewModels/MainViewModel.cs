@@ -122,6 +122,14 @@ public partial class MainViewModel : ObservableObject
         CurrentThemeIndex = (CurrentThemeIndex + 1) % 3;
     }
 
+    [RelayCommand]
+    private void OpenSettingWindow()
+    {
+        // Open the settings window
+        var window = new Translate.Views.SettingWindow();
+        window.Activate();
+    }
+
     partial void OnCurrentThemeIndexChanged(int value)
     {
         OnPropertyChanged(nameof(ThemeGlyph));

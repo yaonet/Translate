@@ -50,7 +50,8 @@
                     </Button>
                     <Button ToolTipService.ToolTip="Setting"
                             Background="Transparent"
-                            BorderBrush="Transparent">
+                            BorderBrush="Transparent"
+                            Command="{x:Bind _viewModel.OpenSettingWindowCommand}">
                         <FontIcon Glyph="&#xE713;" FontSize="14"/>
                     </Button>
                 </StackPanel>
