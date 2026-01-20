@@ -27,34 +27,30 @@
             </TitleBar.IconSource>
             <TitleBar.Content>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <ToggleButton x:Name="AutoTranslateToggle"
+                    <ToggleButton ToolTipService.ToolTip="MouseTranslate"
                                   Margin="0,0,5,0"
-                                  ToolTipService.ToolTip="划词翻译"
-                                  IsChecked="{x:Bind IsAutoTranslateEnabled, Mode=TwoWay}"
+                                  IsChecked="{x:Bind _viewModel.IsAutoTranslateEnabled, Mode=TwoWay}"
                                   Background="Transparent"
                                   BorderBrush="Transparent">
                         <FontIcon Glyph="&#xE962;" FontSize="14"/>
                     </ToggleButton>
-                    <ToggleButton x:Name="AlwaysOnTopToggle"
-                                   Margin="0,0,5,0"
-                                  ToolTipService.ToolTip="置顶"
-                                  IsChecked="{x:Bind IsAlwaysOnTop, Mode=TwoWay}"
-                                  Background="Transparent"
-                                  BorderBrush="Transparent">
+                    <ToggleButton Background="Transparent"
+                                  BorderBrush="Transparent"
+                                  Margin="0,0,5,0"
+                                  ToolTipService.ToolTip="OnTop"
+                                  IsChecked="{x:Bind _viewModel.IsAlwaysOnTop, Mode=TwoWay}">
                         <FontIcon Glyph="&#xE718;" FontSize="14"/>
                     </ToggleButton>
-                    <Button x:Name="ThemeToggle"
-                                  Margin="0,0,5,0"
-                                  ToolTipService.ToolTip="切换主题"
-                                  Background="Transparent"
-                                  BorderBrush="Transparent"
-                                  Click="ToggleTheme">
-                        <FontIcon Glyph="{x:Bind ThemeIcon, Mode=OneWay}" FontSize="14"/>
+                    <Button Margin="0,0,5,0"
+                            ToolTipService.ToolTip="SwitchTheme"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            Command="{x:Bind _viewModel.SwitchThemeCommand}">
+                        <FontIcon Glyph="{x:Bind _viewModel.ThemeGlyph, Mode=OneWay}" FontSize="14"/>
                     </Button>
-                    <Button x:Name="SettingToggle"
-                                  ToolTipService.ToolTip="设置"
-                                  Background="Transparent"
-                                  BorderBrush="Transparent">
+                    <Button ToolTipService.ToolTip="Setting"
+                            Background="Transparent"
+                            BorderBrush="Transparent">
                         <FontIcon Glyph="&#xE713;" FontSize="14"/>
                     </Button>
                 </StackPanel>
@@ -65,28 +61,28 @@
                  AcceptsReturn="True"
                  TextWrapping="Wrap"
                  FontSize="16"
-                 Text="{x:Bind SourceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                 Text="{x:Bind _viewModel.SourceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
         <StackPanel Grid.Row="2"
                     Orientation="Horizontal"
                     HorizontalAlignment="Center">
             <ComboBox Margin="5,0"
                       HorizontalAlignment="Center"
-                      ItemsSource="{x:Bind Code}"
-                      SelectedItem="{x:Bind SourceCode, Mode=TwoWay}">
+                      ItemsSource="{x:Bind _viewModel.Code}"
+                      SelectedItem="{x:Bind _viewModel.SourceCode, Mode=TwoWay}">
             </ComboBox>
             <Button ToolTipService.ToolTip="Switch language"
-                     Click="SwitchLanguage">
+                    Command="{x:Bind _viewModel.SwitchLanguageCommand}">
                 <FontIcon Glyph="&#xE8AB;" FontSize="14"/>
             </Button>
             <ComboBox 
                       Margin="5,0"
                       HorizontalAlignment="Center"
-                      ItemsSource="{x:Bind Code}"
-                      SelectedItem="{x:Bind TargetCode, Mode=TwoWay}">
+                      ItemsSource="{x:Bind _viewModel.Code}"
+                      SelectedItem="{x:Bind _viewModel.TargetCode, Mode=TwoWay}">
             </ComboBox>
             <Button ToolTipService.ToolTip="Switch Text"
-                    Click="SwitchText">
+                    Command="{x:Bind _viewModel.SwitchTextCommand}">
                 <FontIcon Glyph="&#xE8AB;" FontSize="14" RenderTransformOrigin="0.5,0.5">
                     <FontIcon.RenderTransform>
                         <RotateTransform Angle="90"/>
@@ -94,7 +90,7 @@
                 </FontIcon>
             </Button>
             <Button Content="Translate"
-                    Click="DoTranslate"
+                    Command="{x:Bind _viewModel.DoTranslateCommand}"
                     Margin="5,0" />
         </StackPanel>
         <TextBox Grid.Row="3"
@@ -103,7 +99,6 @@
                  TextWrapping="Wrap"
                  FontSize="16"
                  IsReadOnly="True"
-                 Text="{x:Bind TargetText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
+                 Text="{x:Bind _viewModel.TargetText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
     </Grid>
 </Window>
