@@ -7,13 +7,50 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Title="SettingWindow">
+    Title="Settings">
 
     <Window.SystemBackdrop>
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid>
+    <ScrollViewer Padding="24">
+        <StackPanel Spacing="24">
+            <!-- Gemini Settings -->
+            <StackPanel Spacing="12">
+                <TextBlock Text="Gemini" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                
+                <StackPanel Spacing="4">
+                    <TextBlock Text="API Key" Style="{StaticResource CaptionTextBlockStyle}"/>
+                    <PasswordBox x:Name="GeminiApiKeyBox"
+                                 PlaceholderText="Enter your Gemini API key"
+                                 PasswordChanged="GeminiApiKeyBox_PasswordChanged"/>
+                </StackPanel>
+                
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Model" Style="{StaticResource CaptionTextBlockStyle}"/>
+                    <TextBox Text="{x:Bind _viewModel.GeminiModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             PlaceholderText="e.g., gemini-flash-latest"/>
+                </StackPanel>
+            </StackPanel>
 
-    </Grid>
+            <MenuFlyoutSeparator />
+
+            <!-- Ollama Settings -->
+            <StackPanel Spacing="12">
+                <TextBlock Text="Ollama" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Base URL" Style="{StaticResource CaptionTextBlockStyle}"/>
+                    <TextBox Text="{x:Bind _viewModel.OllamaBaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             PlaceholderText="e.g., http://localhost:11434"/>
+                </StackPanel>
+                
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Model" Style="{StaticResource CaptionTextBlockStyle}"/>
+                    <TextBox Text="{x:Bind _viewModel.OllamaModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             PlaceholderText="e.g., translategemma"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
 </Window>

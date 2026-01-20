@@ -13,13 +13,15 @@ public partial class MainViewModel : ObservableObject
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly TextSelectionService _textSelectionService;
+    private readonly IWindowService _windowService;
     private ITranslateService _translateService;
 
-    public MainViewModel(IServiceProvider serviceProvider, TextSelectionService textSelection, IReadOnlyList<string> translateServiceKeys)
+    public MainViewModel(IServiceProvider serviceProvider, TextSelectionService textSelection, IReadOnlyList<string> translateServiceKeys, IWindowService windowService)
     {
         _serviceProvider = serviceProvider;
         _textSelectionService = textSelection;
         _textSelectionService.TextSelected += OnTextSelected;
+        _windowService = windowService;
 
         // Get available services from DI
         TranslateServices = translateServiceKeys;
@@ -125,9 +127,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void OpenSettingWindow()
     {
-        // Open the settings window
-        var window = new Translate.Views.SettingWindow();
-        window.Activate();
+        _windowService.ShowWindow<SettingViewModel>();
     }
 
     partial void OnCurrentThemeIndexChanged(int value)

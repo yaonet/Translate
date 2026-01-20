@@ -1,21 +1,38 @@
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Translate.ViewModels;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using WinRT.Interop;
 
 namespace Translate.Views;
 
 /// <summary>
-/// An empty window that can be used on its own or navigated to within a Frame.
+/// Settings window for configuring translation services.
 /// </summary>
 public sealed partial class SettingWindow : Window
 {
-    private readonly SettingViewModel _viewModel = default!;
+    private readonly SettingViewModel _viewModel;
+
     public SettingWindow()
     {
         InitializeComponent();
         _viewModel = App.Current.Services.GetRequiredService<SettingViewModel>();
+
+        // Set window size
+        var hwnd = WindowNative.GetWindowHandle(this);
+        var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
+        var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
+        appWindow.Resize(new Windows.Graphics.SizeInt32(400, 450));
+
+        // Initialize PasswordBox with current API key
+        GeminiApiKeyBox.Password = _viewModel.GeminiApiKey;
+    }
+
+    private void GeminiApiKeyBox_PasswordChanged(object sender, RoutedEventArgs e)
+    {
+        if (sender is PasswordBox passwordBox)
+        {
+            _viewModel.GeminiApiKey = passwordBox.Password;
+        }
     }
 }

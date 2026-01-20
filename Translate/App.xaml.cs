@@ -34,6 +34,7 @@ namespace Translate
             services.AddSingleton<HttpClient>();
             services.AddSingleton<SettingsService>();
             services.AddSingleton(new TextSelectionService());
+            services.AddSingleton<IWindowService, WindowService>();
 
             // Keyed translate services
             var translateServiceKeys = new List<string>();
