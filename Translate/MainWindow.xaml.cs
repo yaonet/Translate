@@ -29,7 +29,7 @@ namespace Translate
                 presenter.IsAlwaysOnTop = true;
             }
 
-            var windowSize = new Windows.Graphics.SizeInt32(600, 500);
+            var windowSize = new Windows.Graphics.SizeInt32(660, 500);
             AppWindow.Resize(windowSize);
             var displayArea = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary);
             var centerX = (displayArea.WorkArea.Width - windowSize.Width) / 2;

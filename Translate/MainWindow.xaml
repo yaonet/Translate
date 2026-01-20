@@ -66,6 +66,11 @@
         <StackPanel Grid.Row="2"
                     Orientation="Horizontal"
                     HorizontalAlignment="Center">
+            <ComboBox Margin="0"
+                      Width="100"
+                      ToolTipService.ToolTip="Select Translation Service"
+                      ItemsSource="{x:Bind _viewModel.TranslateServices}"
+                      SelectedItem="{x:Bind _viewModel.SelectedServiceKey, Mode=TwoWay}"/>
             <ComboBox Margin="5,0"
                       HorizontalAlignment="Center"
                       ItemsSource="{x:Bind _viewModel.Code}"

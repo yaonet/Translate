@@ -1,22 +1,42 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.UI.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Translate.Services;
 
 namespace Translate.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
-    private readonly ITranslateService _translateService;
+    private readonly IServiceProvider _serviceProvider;
     private readonly TextSelectionService _textSelectionService;
+    private ITranslateService _translateService;
 
-    public MainViewModel(ITranslateService translateService, TextSelectionService textSelection)
+    public MainViewModel(IServiceProvider serviceProvider, TextSelectionService textSelection, IReadOnlyList<string> translateServiceKeys)
     {
-        _translateService = translateService;
+        _serviceProvider = serviceProvider;
         _textSelectionService = textSelection;
         _textSelectionService.TextSelected += OnTextSelected;
+
+        // Get available services from DI
+        TranslateServices = translateServiceKeys;
+        SelectedServiceKey = translateServiceKeys[0];
+
+        // Initialize with default service
+        _translateService = _serviceProvider.GetRequiredKeyedService<ITranslateService>(SelectedServiceKey);
+    }
+
+    // Available translation services (from DI)
+    public IReadOnlyList<string> TranslateServices { get; }
+
+    [ObservableProperty]
+    public partial string SelectedServiceKey { get; set; }
+
+    partial void OnSelectedServiceKeyChanged(string value)
+    {
+        _translateService = _serviceProvider.GetRequiredKeyedService<ITranslateService>(value);
     }
 
     [ObservableProperty]

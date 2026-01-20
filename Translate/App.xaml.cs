@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -32,7 +33,18 @@ namespace Translate
             // Services
             services.AddSingleton<HttpClient>();
             services.AddSingleton(new TextSelectionService());
-            services.AddSingleton<ITranslateService, OllamaTranslateService>();
+
+            // Keyed translate services
+            var translateServiceKeys = new List<string>();
+
+            services.AddKeyedSingleton<ITranslateService, OllamaTranslateService>("Ollama");
+            translateServiceKeys.Add("Ollama");
+
+            services.AddKeyedSingleton<ITranslateService, GeminiTranslateService>("Gemini");
+            translateServiceKeys.Add("Gemini");
+
+            // Register the list of available translate service keys
+            services.AddSingleton<IReadOnlyList<string>>(translateServiceKeys);
 
             // ViewModels
             services.AddTransient<MainViewModel>();
