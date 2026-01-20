@@ -13,44 +13,51 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <ScrollViewer Padding="24">
-        <StackPanel Spacing="24">
-            <!-- Gemini Settings -->
-            <StackPanel Spacing="12">
-                <TextBlock Text="Gemini" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                
-                <StackPanel Spacing="4">
-                    <TextBlock Text="API Key" Style="{StaticResource CaptionTextBlockStyle}"/>
-                    <PasswordBox x:Name="GeminiApiKeyBox"
-                                 PlaceholderText="Enter your Gemini API key"
-                                 PasswordChanged="GeminiApiKeyBox_PasswordChanged"/>
-                </StackPanel>
-                
-                <StackPanel Spacing="4">
-                    <TextBlock Text="Model" Style="{StaticResource CaptionTextBlockStyle}"/>
-                    <TextBox Text="{x:Bind _viewModel.GeminiModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             PlaceholderText="e.g., gemini-flash-latest"/>
-                </StackPanel>
-            </StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-            <MenuFlyoutSeparator />
+        <TitleBar x:Name="AppTitleBar"
+                  IsPaneToggleButtonVisible="True"
+                  PaneToggleRequested="TitleBar_PaneToggleRequested"
+                  Title="Settings">
+            <TitleBar.IconSource>
+                <FontIconSource Glyph="&#xE713;"/>
+            </TitleBar.IconSource>
+        </TitleBar>
 
-            <!-- Ollama Settings -->
-            <StackPanel Spacing="12">
-                <TextBlock Text="Ollama" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                
-                <StackPanel Spacing="4">
-                    <TextBlock Text="Base URL" Style="{StaticResource CaptionTextBlockStyle}"/>
-                    <TextBox Text="{x:Bind _viewModel.OllamaBaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             PlaceholderText="e.g., http://localhost:11434"/>
-                </StackPanel>
-                
-                <StackPanel Spacing="4">
-                    <TextBlock Text="Model" Style="{StaticResource CaptionTextBlockStyle}"/>
-                    <TextBox Text="{x:Bind _viewModel.OllamaModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             PlaceholderText="e.g., translategemma"/>
-                </StackPanel>
-            </StackPanel>
-        </StackPanel>
-    </ScrollViewer>
+        <NavigationView x:Name="NavView"
+                        Grid.Row="1"
+                        IsBackButtonVisible="Collapsed"
+                        IsPaneToggleButtonVisible="False"
+                        IsSettingsVisible="False"
+                        PaneDisplayMode="Left"
+                        OpenPaneLength="200"
+                        SelectionChanged="NavView_SelectionChanged">
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="常规" Tag="General">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE770;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="翻译服务" Tag="TranslationServices">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xF2B7;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+            
+            <NavigationView.FooterMenuItems>
+                <NavigationViewItem Content="关于" Tag="About">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE946;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.FooterMenuItems>
+
+            <Frame x:Name="ContentFrame" />
+        </NavigationView>
+    </Grid>
 </Window>

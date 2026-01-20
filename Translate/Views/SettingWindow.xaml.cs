@@ -1,38 +1,55 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.Extensions.DependencyInjection;
-using Translate.ViewModels;
 using WinRT.Interop;
 
 namespace Translate.Views;
 
 /// <summary>
-/// Settings window for configuring translation services.
+/// Settings window with NavigationView for configuring application settings.
 /// </summary>
 public sealed partial class SettingWindow : Window
 {
-    private readonly SettingViewModel _viewModel;
-
     public SettingWindow()
     {
         InitializeComponent();
-        _viewModel = App.Current.Services.GetRequiredService<SettingViewModel>();
+
+        // Use custom TitleBar instead of native window title bar
+        ExtendsContentIntoTitleBar = true;
+        SetTitleBar(AppTitleBar);
 
         // Set window size
         var hwnd = WindowNative.GetWindowHandle(this);
         var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
         var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
-        appWindow.Resize(new Windows.Graphics.SizeInt32(400, 450));
+        appWindow.Resize(new Windows.Graphics.SizeInt32(600, 500));
 
-        // Initialize PasswordBox with current API key
-        GeminiApiKeyBox.Password = _viewModel.GeminiApiKey;
+        // Select the first item by default
+        NavView.SelectedItem = NavView.MenuItems[0];
     }
 
-    private void GeminiApiKeyBox_PasswordChanged(object sender, RoutedEventArgs e)
+    private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
-        if (sender is PasswordBox passwordBox)
+        if (args.SelectedItem is NavigationViewItem selectedItem)
         {
-            _viewModel.GeminiApiKey = passwordBox.Password;
+            var tag = selectedItem.Tag?.ToString();
+
+            switch (tag)
+            {
+                case "General":
+                    ContentFrame.Navigate(typeof(GeneralSettingsPage));
+                    break;
+                case "TranslationServices":
+                    ContentFrame.Navigate(typeof(TranslationServicesPage));
+                    break;
+                case "About":
+                    ContentFrame.Navigate(typeof(AboutPage));
+                    break;
+            }
         }
+    }
+
+    private void TitleBar_PaneToggleRequested(TitleBar sender, object args)
+    {
+        NavView.IsPaneOpen = !NavView.IsPaneOpen;
     }
 }
