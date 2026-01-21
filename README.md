@@ -1,7 +1,8 @@
 ﻿# Translate
 AI translation software developed using WinUI 3.
 
-![MainWindow](./MainWindow.png)
+<img src="./MainWindow.png" width="389" height="305"/>
 
-![SettingWindow](./SettingWindow.png)
+<img src="./SettingWindow.png" width="550" height="440"/>
+
 
