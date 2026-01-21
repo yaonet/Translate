@@ -4,83 +4,56 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Translate.Helpers;
 
 namespace Translate.Services
 {
     /// <summary>
     /// Translation service using Ollama local LLM.
     /// </summary>
-    public class OllamaTranslateService : ITranslateService
+    public class OllamaTranslateService : BaseTranslateService
     {
         private readonly HttpClient _http;
         private readonly SettingsService _settings;
-        public string Name => "Ollama";
 
-        public OllamaTranslateService(HttpClient httpClient, SettingsService settings)
+        public override string Name => "Ollama";
+
+        public OllamaTranslateService(HttpClient httpClient, SettingsService settings, Microsoft.Extensions.Logging.ILogger<OllamaTranslateService> logger)
+            : base(logger)
         {
             _http = httpClient;
             _settings = settings;
         }
-        public async Task<TranslationResult> TranslateAsync(TranslationRequest request, CancellationToken cancellationToken = default)
+
+        protected override async Task<TranslationResult> ExecuteTranslationAsync(TranslationRequest request, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(request.Text))
+            string prompt = GeneratePrompt(request);
+
+            var body = new
             {
-                return new TranslationResult(false, null, "Please enter text to translate.");
+                model = _settings.OllamaModel,
+                prompt = prompt!,
+                stream = false
+            };
+
+            var json = JsonSerializer.Serialize(body);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            using var response = await _http.PostAsync($"{_settings.OllamaBaseUrl}/api/generate", content, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                return new TranslationResult(false, null, $"Translation failed: {response.StatusCode}");
             }
 
-            try
+            var result = await response.Content.ReadAsStringAsync(cancellationToken);
+            using var doc = JsonDocument.Parse(result);
+
+            var translation = doc.RootElement.GetProperty("response").GetString();
+            if (string.IsNullOrWhiteSpace(translation))
             {
-                string prompt = LanguageHelper.PromptTemplate
-                    .Replace("{SOURCE_LANG}", LanguageHelper.CodeToLanguage(request.SourceLanguageCode))
-                    .Replace("{SOURCE_CODE}", request.SourceLanguageCode)
-                    .Replace("{TARGET_LANG}", LanguageHelper.CodeToLanguage(request.TargetLanguageCode))
-                    .Replace("{TARGET_CODE}", request.TargetLanguageCode)
-                    .Replace("{TEXT}", request.Text);
-
-                var body = new
-                {
-                    model = _settings.OllamaModel,
-                    prompt = prompt!,
-                    stream = false
-                };
-
-                var json = JsonSerializer.Serialize(body);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                using var response = await _http.PostAsync($"{_settings.OllamaBaseUrl}/api/generate", content, cancellationToken);
-                if (!response.IsSuccessStatusCode)
-                {
-                    return new TranslationResult(false, null, $"Translation failed: {response.StatusCode}");
-                }
-
-                var result = await response.Content.ReadAsStringAsync(cancellationToken);
-                using var doc = JsonDocument.Parse(result);
-
-                var translation = doc.RootElement.GetProperty("response").GetString();
-                if (string.IsNullOrWhiteSpace(translation))
-                {
-                    return new TranslationResult(false, null, "No translation returned.");
-                }
-
-                return new TranslationResult(true, translation, null);
+                return new TranslationResult(false, null, "No translation returned.");
             }
-            catch (HttpRequestException ex)
-            {
-                return new TranslationResult(false, null, $"Network error: {ex.Message}");
-            }
-            catch (JsonException ex)
-            {
-                return new TranslationResult(false, null, $"Invalid response format: {ex.Message}");
-            }
-            catch (OperationCanceledException)
-            {
-                return new TranslationResult(false, null, "Translation cancelled.");
-            }
-            catch (Exception ex)
-            {
-                return new TranslationResult(false, null, $"Error: {ex.Message}");
-            }
+
+            return new TranslationResult(true, translation, null);
         }
     }
 }

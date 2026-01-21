@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Windows.ApplicationModel.DataTransfer;
 
@@ -11,6 +12,7 @@ namespace Translate.Services
     /// </summary>
     public class TextSelectionService : IDisposable
     {
+        private readonly ILogger<TextSelectionService> _logger;
         private IntPtr _mouseHookHandle = IntPtr.Zero;
         private NativeMethods.LowLevelMouseProc? _mouseProc;
         private System.Drawing.Point _mouseDownPos;
@@ -28,8 +30,9 @@ namespace Translate.Services
         /// </summary>
         public event Action<string>? TextSelected;
 
-        public TextSelectionService(DispatcherQueue? dispatcherQueue = null)
+        public TextSelectionService(ILogger<TextSelectionService> logger, DispatcherQueue? dispatcherQueue = null)
         {
+            _logger = logger;
             _dispatcherQueue = dispatcherQueue;
         }
 
@@ -47,12 +50,20 @@ namespace Translate.Services
         public void Start()
         {
             if (_mouseHookHandle != IntPtr.Zero) return;
+            
+            _logger.LogInformation("Starting text selection mouse hook.");
             _mouseProc = MouseHookCallback;
             using var process = System.Diagnostics.Process.GetCurrentProcess();
             using var module = process.MainModule;
             _mouseHookHandle = NativeMethods.SetWindowsHookEx(
                 NativeMethods.WH_MOUSE_LL, _mouseProc,
                 NativeMethods.GetModuleHandle(module?.ModuleName), 0);
+
+            if (_mouseHookHandle == IntPtr.Zero)
+            {
+                int errorCode = Marshal.GetLastWin32Error();
+                _logger.LogError("Failed to set mouse hook. Error code: {ErrorCode}", errorCode);
+            }
         }
 
         /// <summary>
@@ -62,6 +73,7 @@ namespace Translate.Services
         {
             if (_mouseHookHandle != IntPtr.Zero)
             {
+                _logger.LogInformation("Stopping text selection mouse hook.");
                 NativeMethods.UnhookWindowsHookEx(_mouseHookHandle);
                 _mouseHookHandle = IntPtr.Zero;
             }
@@ -69,38 +81,45 @@ namespace Translate.Services
 
         private IntPtr MouseHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if (nCode >= 0)
+            try
             {
-                var hookStruct = Marshal.PtrToStructure<NativeMethods.MSLLHOOKSTRUCT>(lParam);
-                if (wParam == NativeMethods.WM_LBUTTONDOWN)
+                if (nCode >= 0)
                 {
-                    _mouseDownPos = new System.Drawing.Point(hookStruct.pt.x, hookStruct.pt.y);
-                    _isMouseDown = true;
-                    var now = DateTime.Now;
-                    var timeDiff = (now - _lastClickTime).TotalMilliseconds;
-                    var distX = Math.Abs(hookStruct.pt.x - _lastClickPos.X);
-                    var distY = Math.Abs(hookStruct.pt.y - _lastClickPos.Y);
-                    if (timeDiff < DoubleClickTime && distX < DoubleClickDistance && distY < DoubleClickDistance)
+                    var hookStruct = Marshal.PtrToStructure<NativeMethods.MSLLHOOKSTRUCT>(lParam);
+                    if (wParam == NativeMethods.WM_LBUTTONDOWN)
                     {
-                        _ = HandleTextSelectionAsync();
-                        _lastClickTime = DateTime.MinValue;
+                        _mouseDownPos = new System.Drawing.Point(hookStruct.pt.x, hookStruct.pt.y);
+                        _isMouseDown = true;
+                        var now = DateTime.Now;
+                        var timeDiff = (now - _lastClickTime).TotalMilliseconds;
+                        var distX = Math.Abs(hookStruct.pt.x - _lastClickPos.X);
+                        var distY = Math.Abs(hookStruct.pt.y - _lastClickPos.Y);
+                        if (timeDiff < DoubleClickTime && distX < DoubleClickDistance && distY < DoubleClickDistance)
+                        {
+                            _ = HandleTextSelectionAsync();
+                            _lastClickTime = DateTime.MinValue;
+                        }
+                        else
+                        {
+                            _lastClickTime = now;
+                            _lastClickPos = new System.Drawing.Point(hookStruct.pt.x, hookStruct.pt.y);
+                        }
                     }
-                    else
+                    else if (wParam == NativeMethods.WM_LBUTTONUP && _isMouseDown)
                     {
-                        _lastClickTime = now;
-                        _lastClickPos = new System.Drawing.Point(hookStruct.pt.x, hookStruct.pt.y);
+                        _isMouseDown = false;
+                        var deltaX = Math.Abs(hookStruct.pt.x - _mouseDownPos.X);
+                        var deltaY = Math.Abs(hookStruct.pt.y - _mouseDownPos.Y);
+                        if (deltaX > 10 || deltaY > 5)
+                        {
+                            _ = HandleTextSelectionAsync();
+                        }
                     }
                 }
-                else if (wParam == NativeMethods.WM_LBUTTONUP && _isMouseDown)
-                {
-                    _isMouseDown = false;
-                    var deltaX = Math.Abs(hookStruct.pt.x - _mouseDownPos.X);
-                    var deltaY = Math.Abs(hookStruct.pt.y - _mouseDownPos.Y);
-                    if (deltaX > 10 || deltaY > 5)
-                    {
-                        _ = HandleTextSelectionAsync();
-                    }
-                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in MouseHookCallback.");
             }
             return NativeMethods.CallNextHookEx(_mouseHookHandle, nCode, wParam, lParam);
         }
@@ -114,7 +133,10 @@ namespace Translate.Services
                 if (currentContent.Contains(StandardDataFormats.Text))
                     _previousClipboardText = await currentContent.GetTextAsync();
             }
-            catch { }
+            catch (Exception ex) 
+            {
+                _logger.LogDebug(ex, "Failed to get previous clipboard content.");
+            }
 
             NativeMethods.keybd_event(NativeMethods.VK_CONTROL, 0, 0, UIntPtr.Zero);
             NativeMethods.keybd_event(NativeMethods.VK_C, 0, 0, UIntPtr.Zero);
@@ -130,6 +152,7 @@ namespace Translate.Services
                     var text = (await dataPackageView.GetTextAsync()).Trim();
                     if (!string.IsNullOrWhiteSpace(text) && text != _previousClipboardText)
                     {
+                        _logger.LogInformation("Text selected via mouse hook: {Length} chars", text.Length);
                         if (_dispatcherQueue != null)
                             _dispatcherQueue.TryEnqueue(() => TextSelected?.Invoke(text));
                         else
@@ -137,7 +160,10 @@ namespace Translate.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error handling text selection.");
+            }
         }
 
         public void Dispose()

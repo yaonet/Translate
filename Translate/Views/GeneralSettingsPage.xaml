@@ -34,6 +34,17 @@
                            Style="{StaticResource CaptionTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
             </StackPanel>
+
+            <!-- Log Settings -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="日志" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <Button Content="打开日志文件夹" Click="OpenLogFolder_Click"/>
+                </StackPanel>
+                <TextBlock Text="查看应用程序运行日志以便排查问题"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            </StackPanel>
         </StackPanel>
     </ScrollViewer>
 </Page>
