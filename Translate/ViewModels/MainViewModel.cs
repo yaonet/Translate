@@ -14,14 +14,16 @@ public partial class MainViewModel : ObservableObject
     private readonly IServiceProvider _serviceProvider;
     private readonly TextSelectionService _textSelectionService;
     private readonly IWindowService _windowService;
+    private readonly HistoryService _historyService;
     private ITranslateService _translateService;
 
-    public MainViewModel(IServiceProvider serviceProvider, TextSelectionService textSelection, IReadOnlyList<string> translateServiceKeys, IWindowService windowService)
+    public MainViewModel(IServiceProvider serviceProvider, TextSelectionService textSelection, IReadOnlyList<string> translateServiceKeys, IWindowService windowService, HistoryService historyService)
     {
         _serviceProvider = serviceProvider;
         _textSelectionService = textSelection;
         _textSelectionService.TextSelected += OnTextSelected;
         _windowService = windowService;
+        _historyService = historyService;
 
         // Get available services from DI
         TranslateServices = translateServiceKeys;
@@ -101,9 +103,22 @@ public partial class MainViewModel : ObservableObject
         var request = new TranslationRequest(SourceText, SourceCode, TargetCode);
         var result = await _translateService.TranslateAsync(request);
 
-        TargetText = result.Success
-            ? result.TranslatedText!
-            : result.ErrorMessage!;
+        if (result.Success)
+        {
+            TargetText = result.TranslatedText!;
+
+            // Save to history
+            await _historyService.AddRecordAsync(
+                SourceText,
+                result.TranslatedText!,
+                SourceCode,
+                TargetCode,
+                _translateService.Name);
+        }
+        else
+        {
+            TargetText = result.ErrorMessage!;
+        }
     }
 
     [RelayCommand]

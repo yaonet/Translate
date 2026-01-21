@@ -21,6 +21,7 @@ namespace Translate.Services
         private const string OpenAIApiKeyKey = "OpenAIApiKey";
         private const string OpenAIBaseUrlKey = "OpenAIBaseUrl";
         private const string OpenAIModelKey = "OpenAIModel";
+        private const string MaxHistoryCountKey = "MaxHistoryCount";
 
         // Default values
         private const string DefaultGeminiBaseUrl = "https://generativelanguage.googleapis.com";
@@ -30,7 +31,8 @@ namespace Translate.Services
         private const string DefaultDeepSeekBaseUrl = "https://api.deepseek.com";
         private const string DefaultDeepSeekModel = "deepseek-chat";
         private const string DefaultOpenAIBaseUrl = "https://api.openai.com/v1";
-        private const string DefaultOpenAIModel = "gpt-4o-mini";
+        private const string DefaultOpenAIModel = "gpt-5-mini";
+        private const int DefaultMaxHistoryCount = 300;
 
         public SettingsService()
         {
@@ -119,6 +121,16 @@ namespace Translate.Services
 
         #endregion
 
+        #region General Settings
+
+        public int MaxHistoryCount
+        {
+            get => GetIntSetting(MaxHistoryCountKey, DefaultMaxHistoryCount);
+            set => SetIntSetting(MaxHistoryCountKey, value);
+        }
+
+        #endregion
+
         #region Helper Methods
 
         private string GetSetting(string key, string defaultValue)
@@ -131,6 +143,20 @@ namespace Translate.Services
         }
 
         private void SetSetting(string key, string value)
+        {
+            _localSettings.Values[key] = value;
+        }
+
+        private int GetIntSetting(string key, int defaultValue)
+        {
+            if (_localSettings.Values.TryGetValue(key, out var value) && value is int intValue)
+            {
+                return intValue;
+            }
+            return defaultValue;
+        }
+
+        private void SetIntSetting(string key, int value)
         {
             _localSettings.Values[key] = value;
         }

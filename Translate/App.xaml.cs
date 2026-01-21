@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
+using Translate.Data;
 using Translate.Services;
 using Translate.ViewModels;
+using Windows.Storage;
 
 namespace Translate
 {
@@ -54,9 +58,18 @@ namespace Translate
             // Register the list of available translate service keys
             services.AddSingleton<IReadOnlyList<string>>(translateServiceKeys);
 
+            // Database context for translation history
+            var dbPath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "translate_history.db");
+            services.AddDbContextFactory<TranslateDbContext>(options =>
+                options.UseSqlite($"Data Source={dbPath}"));
+
+            // History service
+            services.AddSingleton<HistoryService>();
+
             // ViewModels
             services.AddTransient<MainViewModel>();
             services.AddTransient<SettingViewModel>();
+            services.AddTransient<HistoryViewModel>();
 
             return services.BuildServiceProvider();
         }

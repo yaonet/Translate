@@ -35,6 +35,9 @@ public sealed partial class SettingWindow : Window
 
             switch (tag)
             {
+                case "History":
+                    ContentFrame.Navigate(typeof(HistoryPage));
+                    break;
                 case "General":
                     ContentFrame.Navigate(typeof(GeneralSettingsPage));
                     break;
