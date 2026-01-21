@@ -44,6 +44,12 @@ public sealed partial class SettingWindow : Window
                 case "Ollama":
                     ContentFrame.Navigate(typeof(OllamaSettingsPage));
                     break;
+                case "DeepSeek":
+                    ContentFrame.Navigate(typeof(DeepSeekSettingsPage));
+                    break;
+                case "OpenAI":
+                    ContentFrame.Navigate(typeof(OpenAISettingsPage));
+                    break;
                 case "About":
                     ContentFrame.Navigate(typeof(AboutPage));
                     break;

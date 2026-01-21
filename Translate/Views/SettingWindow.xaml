@@ -57,6 +57,16 @@
                                 <FontIcon Glyph="&#xE99A;"/>
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
+                        <NavigationViewItem Content="DeepSeek" Tag="DeepSeek">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xE8F2;"/>
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="OpenAI" Tag="OpenAI">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xE8BE;"/>
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
                     </NavigationViewItem.MenuItems>
                 </NavigationViewItem>
             </NavigationView.MenuItems>

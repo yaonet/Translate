@@ -21,6 +21,12 @@
             </StackPanel>
             
             <StackPanel Spacing="4">
+                <TextBlock Text="Base URL" Style="{StaticResource CaptionTextBlockStyle}"/>
+                <TextBox x:Name="GeminiBaseUrlTextBox"
+                         PlaceholderText="e.g., https://generativelanguage.googleapis.com"/>
+            </StackPanel>
+            
+            <StackPanel Spacing="4">
                 <TextBlock Text="Model" Style="{StaticResource CaptionTextBlockStyle}"/>
                 <TextBox x:Name="GeminiModelTextBox"
                          PlaceholderText="e.g., gemini-flash-latest"/>

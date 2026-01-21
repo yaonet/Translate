@@ -60,7 +60,7 @@ namespace Translate.Services
                 var json = JsonSerializer.Serialize(body);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var url = $"https://generativelanguage.googleapis.com/v1beta/models/{_settings.GeminiModel}:generateContent?key={_settings.GeminiApiKey}";
+                var url = $"{_settings.GeminiBaseUrl.TrimEnd('/')}/v1beta/models/{_settings.GeminiModel}:generateContent?key={_settings.GeminiApiKey}";
                 using var response = await _http.PostAsync(url, content, cancellationToken);
 
                 if (!response.IsSuccessStatusCode)

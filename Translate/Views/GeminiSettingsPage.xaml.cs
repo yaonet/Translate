@@ -16,12 +16,14 @@ public sealed partial class GeminiSettingsPage : Page
     {
         InitializeComponent();
         _viewModel = App.Current.Services.GetRequiredService<SettingViewModel>();
-        
+
         // Initialize controls with current values
         GeminiApiKeyBox.Password = _viewModel.GeminiApiKey;
+        GeminiBaseUrlTextBox.Text = _viewModel.GeminiBaseUrl;
         GeminiModelTextBox.Text = _viewModel.GeminiModel;
 
-        // Subscribe to TextChanged event for two-way binding
+        // Subscribe to TextChanged events for two-way binding
+        GeminiBaseUrlTextBox.TextChanged += (s, e) => _viewModel.GeminiBaseUrl = GeminiBaseUrlTextBox.Text;
         GeminiModelTextBox.TextChanged += (s, e) => _viewModel.GeminiModel = GeminiModelTextBox.Text;
     }
 

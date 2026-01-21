@@ -45,6 +45,12 @@ namespace Translate
             services.AddKeyedSingleton<ITranslateService, GeminiTranslateService>("Gemini");
             translateServiceKeys.Add("Gemini");
 
+            services.AddKeyedSingleton<ITranslateService, DeepSeekTranslateService>("DeepSeek");
+            translateServiceKeys.Add("DeepSeek");
+
+            services.AddKeyedSingleton<ITranslateService, OpenAITranslateService>("OpenAI");
+            translateServiceKeys.Add("OpenAI");
+
             // Register the list of available translate service keys
             services.AddSingleton<IReadOnlyList<string>>(translateServiceKeys);
 
