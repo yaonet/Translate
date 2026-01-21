@@ -12,15 +12,15 @@ namespace Translate.Services
     /// </summary>
     public class GeminiTranslateService : BaseTranslateService
     {
-        private readonly HttpClient _http;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly SettingsService _settings;
 
         public override string Name => "Gemini";
 
-        public GeminiTranslateService(HttpClient httpClient, SettingsService settings, Microsoft.Extensions.Logging.ILogger<GeminiTranslateService> logger)
+        public GeminiTranslateService(IHttpClientFactory httpClientFactory, SettingsService settings, Microsoft.Extensions.Logging.ILogger<GeminiTranslateService> logger)
             : base(logger)
         {
-            _http = httpClient;
+            _httpClientFactory = httpClientFactory;
             _settings = settings;
         }
 
@@ -51,7 +51,9 @@ namespace Translate.Services
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var url = $"{_settings.GeminiBaseUrl.TrimEnd('/')}/v1beta/models/{_settings.GeminiModel}:generateContent?key={_settings.GeminiApiKey}";
-            using var response = await _http.PostAsync(url, content, cancellationToken);
+
+            using var httpClient = _httpClientFactory.CreateClient("Gemini");
+            using var response = await httpClient.PostAsync(url, content, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {

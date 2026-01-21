@@ -12,15 +12,15 @@ namespace Translate.Services
     /// </summary>
     public class OpenAITranslateService : BaseTranslateService
     {
-        private readonly HttpClient _http;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly SettingsService _settings;
 
         public override string Name => "OpenAI";
 
-        public OpenAITranslateService(HttpClient httpClient, SettingsService settings, Microsoft.Extensions.Logging.ILogger<OpenAITranslateService> logger)
+        public OpenAITranslateService(IHttpClientFactory httpClientFactory, SettingsService settings, Microsoft.Extensions.Logging.ILogger<OpenAITranslateService> logger)
             : base(logger)
         {
-            _http = httpClient;
+            _httpClientFactory = httpClientFactory;
             _settings = settings;
         }
 
@@ -48,11 +48,12 @@ namespace Translate.Services
 
             var url = $"{_settings.OpenAIBaseUrl.TrimEnd('/')}/chat/completions";
 
+            using var httpClient = _httpClientFactory.CreateClient("OpenAI");
             using var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
             requestMessage.Content = content;
             requestMessage.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _settings.OpenAIApiKey);
 
-            using var response = await _http.SendAsync(requestMessage, cancellationToken);
+            using var response = await httpClient.SendAsync(requestMessage, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {

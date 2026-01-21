@@ -12,15 +12,15 @@ namespace Translate.Services
     /// </summary>
     public class OllamaTranslateService : BaseTranslateService
     {
-        private readonly HttpClient _http;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly SettingsService _settings;
 
         public override string Name => "Ollama";
 
-        public OllamaTranslateService(HttpClient httpClient, SettingsService settings, Microsoft.Extensions.Logging.ILogger<OllamaTranslateService> logger)
+        public OllamaTranslateService(IHttpClientFactory httpClientFactory, SettingsService settings, Microsoft.Extensions.Logging.ILogger<OllamaTranslateService> logger)
             : base(logger)
         {
-            _http = httpClient;
+            _httpClientFactory = httpClientFactory;
             _settings = settings;
         }
 
@@ -38,7 +38,8 @@ namespace Translate.Services
             var json = JsonSerializer.Serialize(body);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            using var response = await _http.PostAsync($"{_settings.OllamaBaseUrl}/api/generate", content, cancellationToken);
+            using var httpClient = _httpClientFactory.CreateClient("Ollama");
+            using var response = await httpClient.PostAsync($"{_settings.OllamaBaseUrl}/api/generate", content, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 return new TranslationResult(false, null, $"Translation failed: {response.StatusCode}");

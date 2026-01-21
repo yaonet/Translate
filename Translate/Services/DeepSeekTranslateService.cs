@@ -12,15 +12,15 @@ namespace Translate.Services
     /// </summary>
     public class DeepSeekTranslateService : BaseTranslateService
     {
-        private readonly HttpClient _http;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly SettingsService _settings;
 
         public override string Name => "DeepSeek";
 
-        public DeepSeekTranslateService(HttpClient httpClient, SettingsService settings, Microsoft.Extensions.Logging.ILogger<DeepSeekTranslateService> logger)
+        public DeepSeekTranslateService(IHttpClientFactory httpClientFactory, SettingsService settings, Microsoft.Extensions.Logging.ILogger<DeepSeekTranslateService> logger)
             : base(logger)
         {
-            _http = httpClient;
+            _httpClientFactory = httpClientFactory;
             _settings = settings;
         }
 
@@ -48,11 +48,12 @@ namespace Translate.Services
 
             var url = $"{_settings.DeepSeekBaseUrl.TrimEnd('/')}/chat/completions";
 
+            using var httpClient = _httpClientFactory.CreateClient("DeepSeek");
             using var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
             requestMessage.Content = content;
             requestMessage.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _settings.DeepSeekApiKey);
 
-            using var response = await _http.SendAsync(requestMessage, cancellationToken);
+            using var response = await httpClient.SendAsync(requestMessage, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {

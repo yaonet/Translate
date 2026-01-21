@@ -66,8 +66,25 @@ namespace Translate
                 loggingBuilder.AddSerilog(dispose: true);
             });
 
+            // HttpClientFactory with named clients for different services
+            services.AddHttpClient("Gemini", c =>
+            {
+                c.Timeout = TimeSpan.FromSeconds(60);
+            });
+            services.AddHttpClient("Ollama", c =>
+            {
+                c.Timeout = TimeSpan.FromSeconds(120); // Ollama may be slower
+            });
+            services.AddHttpClient("DeepSeek", c =>
+            {
+                c.Timeout = TimeSpan.FromSeconds(60);
+            });
+            services.AddHttpClient("OpenAI", c =>
+            {
+                c.Timeout = TimeSpan.FromSeconds(60);
+            });
+
             // Services
-            services.AddSingleton<HttpClient>();
             services.AddSingleton<SettingsService>();
             services.AddSingleton<TextSelectionService>();
             services.AddSingleton<IWindowService, WindowService>();
@@ -100,7 +117,7 @@ namespace Translate
 
             // ViewModels
             services.AddTransient<MainViewModel>();
-            services.AddTransient<SettingViewModel>();
+            services.AddSingleton<SettingViewModel>();
             services.AddTransient<HistoryViewModel>();
             services.AddTransient<GeneralSettingsViewModel>();
 

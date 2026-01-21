@@ -1,13 +1,15 @@
+using Windows.Security.Credentials;
 using Windows.Storage;
 
 namespace Translate.Services
 {
     /// <summary>
-    /// Service for managing application settings using LocalSettings.
+    /// Service for managing application settings using LocalSettings and PasswordVault for secure storage.
     /// </summary>
     public class SettingsService
     {
         private readonly ApplicationDataContainer _localSettings;
+        private readonly PasswordVault _vault;
 
         // Setting keys
         private const string GeminiApiKeyKey = "GeminiApiKey";
@@ -23,6 +25,9 @@ namespace Translate.Services
         private const string OpenAIModelKey = "OpenAIModel";
         private const string MaxHistoryCountKey = "MaxHistoryCount";
 
+        // Resource name for PasswordVault
+        private const string VaultResource = "TranslateApp";
+
         // Default values
         private const string DefaultGeminiBaseUrl = "https://generativelanguage.googleapis.com";
         private const string DefaultGeminiModel = "gemini-flash-latest";
@@ -31,20 +36,21 @@ namespace Translate.Services
         private const string DefaultDeepSeekBaseUrl = "https://api.deepseek.com";
         private const string DefaultDeepSeekModel = "deepseek-chat";
         private const string DefaultOpenAIBaseUrl = "https://api.openai.com/v1";
-        private const string DefaultOpenAIModel = "gpt-5-mini";
+        private const string DefaultOpenAIModel = "gpt-4o-mini";
         private const int DefaultMaxHistoryCount = 300;
 
         public SettingsService()
         {
             _localSettings = ApplicationData.Current.LocalSettings;
+            _vault = new PasswordVault();
         }
 
         #region Gemini Settings
 
         public string GeminiApiKey
         {
-            get => GetSetting(GeminiApiKeyKey, string.Empty);
-            set => SetSetting(GeminiApiKeyKey, value);
+            get => GetSecureSetting(GeminiApiKeyKey);
+            set => SetSecureSetting(GeminiApiKeyKey, value);
         }
 
         public string GeminiBaseUrl
@@ -81,8 +87,8 @@ namespace Translate.Services
 
         public string DeepSeekApiKey
         {
-            get => GetSetting(DeepSeekApiKeyKey, string.Empty);
-            set => SetSetting(DeepSeekApiKeyKey, value);
+            get => GetSecureSetting(DeepSeekApiKeyKey);
+            set => SetSecureSetting(DeepSeekApiKeyKey, value);
         }
 
         public string DeepSeekBaseUrl
@@ -103,8 +109,8 @@ namespace Translate.Services
 
         public string OpenAIApiKey
         {
-            get => GetSetting(OpenAIApiKeyKey, string.Empty);
-            set => SetSetting(OpenAIApiKeyKey, value);
+            get => GetSecureSetting(OpenAIApiKeyKey);
+            set => SetSecureSetting(OpenAIApiKeyKey, value);
         }
 
         public string OpenAIBaseUrl
@@ -161,6 +167,47 @@ namespace Translate.Services
             _localSettings.Values[key] = value;
         }
 
+        /// <summary>
+        /// Retrieves a secure setting from the Windows PasswordVault.
+        /// </summary>
+        private string GetSecureSetting(string key)
+        {
+            try
+            {
+                var credential = _vault.Retrieve(VaultResource, key);
+                credential.RetrievePassword();
+                return credential.Password;
+            }
+            catch
+            {
+                // Credential not found or access denied
+                return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Stores a secure setting in the Windows PasswordVault.
+        /// </summary>
+        private void SetSecureSetting(string key, string value)
+        {
+            try
+            {
+                // Remove existing credential if present
+                var existing = _vault.Retrieve(VaultResource, key);
+                _vault.Remove(existing);
+            }
+            catch
+            {
+                // Credential doesn't exist, ignore
+            }
+
+            if (!string.IsNullOrEmpty(value))
+            {
+                _vault.Add(new PasswordCredential(VaultResource, key, value));
+            }
+        }
+
         #endregion
     }
 }
+
