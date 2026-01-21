@@ -19,13 +19,29 @@ public class WindowService : IWindowService
         // Add new mappings here: { typeof(AboutViewModel), () => new AboutWindow() }
     };
 
+    // Track open windows to implement singleton pattern
+    private readonly Dictionary<Type, Window> _openWindows = new();
+
     public void ShowWindow<TViewModel>() where TViewModel : ObservableObject
     {
         var viewModelType = typeof(TViewModel);
 
+        // Check if window is already open
+        if (_openWindows.TryGetValue(viewModelType, out var existingWindow))
+        {
+            // Activate the existing window
+            existingWindow.Activate();
+            return;
+        }
+
         if (_windowFactories.TryGetValue(viewModelType, out var factory))
         {
             var window = factory();
+
+            // Track the window and remove it when closed
+            _openWindows[viewModelType] = window;
+            window.Closed += (s, e) => _openWindows.Remove(viewModelType);
+
             window.Activate();
         }
         else

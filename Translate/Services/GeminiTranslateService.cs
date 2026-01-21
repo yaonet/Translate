@@ -10,23 +10,13 @@ namespace Translate.Services
     /// <summary>
     /// Translation service using Google Gemini API.
     /// </summary>
-    public class GeminiTranslateService : BaseTranslateService
+    public class GeminiTranslateService(IHttpClientFactory httpClientFactory, SettingsService settings, Microsoft.Extensions.Logging.ILogger<GeminiTranslateService> logger) : BaseTranslateService(logger)
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly SettingsService _settings;
-
         public override string Name => "Gemini";
-
-        public GeminiTranslateService(IHttpClientFactory httpClientFactory, SettingsService settings, Microsoft.Extensions.Logging.ILogger<GeminiTranslateService> logger)
-            : base(logger)
-        {
-            _httpClientFactory = httpClientFactory;
-            _settings = settings;
-        }
 
         protected override string? ValidateSettings()
         {
-            return string.IsNullOrWhiteSpace(_settings.GeminiApiKey) ? "Gemini API key is not configured." : null;
+            return string.IsNullOrWhiteSpace(settings.GeminiApiKey) ? "Gemini API key is not configured." : null;
         }
 
         protected override async Task<TranslationResult> ExecuteTranslationAsync(TranslationRequest request, CancellationToken cancellationToken)
@@ -50,11 +40,17 @@ namespace Translate.Services
             var json = JsonSerializer.Serialize(body);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var url = $"{_settings.GeminiBaseUrl.TrimEnd('/')}/v1beta/models/{_settings.GeminiModel}:generateContent?key={_settings.GeminiApiKey}";
+            var url = $"{settings.GeminiBaseUrl.TrimEnd('/')}/v1beta/models/{settings.GeminiModel}:generateContent";
 
-            using var httpClient = _httpClientFactory.CreateClient("Gemini");
-            using var response = await httpClient.PostAsync(url, content, cancellationToken);
+            using var httpClient = httpClientFactory.CreateClient("Gemini");
+            
+            // Use header instead of URL parameter for better security
+            using var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
+            requestMessage.Headers.Add("x-goog-api-key", settings.GeminiApiKey);
+            requestMessage.Content = content;
 
+            using var response = await httpClient.SendAsync(requestMessage, cancellationToken);
+            
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);

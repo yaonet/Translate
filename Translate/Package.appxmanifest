@@ -9,8 +9,8 @@
 
   <Identity
     Name="2a11c89b-6ce7-4aa4-9ee5-f7082e0af149"
-    Publisher="CN=yhio"
-    Version="1.0.0.0" />
+    Publisher="CN=yaonet"
+    Version="1.0.2.0" />
 
   <mp:PhoneIdentity PhoneProductId="2a11c89b-6ce7-4aa4-9ee5-f7082e0af149" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
