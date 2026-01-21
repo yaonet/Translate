@@ -17,18 +17,19 @@
                 <TextBlock Text="API Key" Style="{StaticResource CaptionTextBlockStyle}"/>
                 <PasswordBox x:Name="DeepSeekApiKeyBox"
                              PlaceholderText="Enter your DeepSeek API key"
+                             Password="{x:Bind ViewModel.DeepSeekApiKey, Mode=TwoWay}"
                              PasswordChanged="DeepSeekApiKeyBox_PasswordChanged"/>
             </StackPanel>
             
             <StackPanel Spacing="4">
                 <TextBlock Text="Base URL" Style="{StaticResource CaptionTextBlockStyle}"/>
-                <TextBox x:Name="DeepSeekBaseUrlTextBox"
+                <TextBox Text="{x:Bind ViewModel.DeepSeekBaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          PlaceholderText="e.g., https://api.deepseek.com"/>
             </StackPanel>
             
             <StackPanel Spacing="4">
                 <TextBlock Text="Model" Style="{StaticResource CaptionTextBlockStyle}"/>
-                <TextBox x:Name="DeepSeekModelTextBox"
+                <TextBox Text="{x:Bind ViewModel.DeepSeekModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          PlaceholderText="e.g., deepseek-chat"/>
             </StackPanel>
         </StackPanel>

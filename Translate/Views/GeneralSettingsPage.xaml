@@ -18,14 +18,13 @@
                 <TextBlock Text="历史记录上限" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                 <StackPanel Orientation="Horizontal" Spacing="12">
                     <NumberBox x:Name="MaxHistoryNumberBox"
-                               Value="{x:Bind MaxHistoryCount, Mode=TwoWay}"
+                               Value="{x:Bind ViewModel.MaxHistoryCount, Mode=TwoWay}"
                                Minimum="10"
                                Maximum="10000"
                                SpinButtonPlacementMode="Compact"
                                SmallChange="10"
                                LargeChange="100"
-                               Width="150"
-                               ValueChanged="MaxHistoryNumberBox_ValueChanged"/>
+                               Width="150"/>
                     <TextBlock Text="条" 
                                VerticalAlignment="Center"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
@@ -39,7 +38,7 @@
             <StackPanel Spacing="8">
                 <TextBlock Text="日志" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <Button Content="打开日志文件夹" Click="OpenLogFolder_Click"/>
+                    <Button Content="打开日志文件夹" Command="{x:Bind ViewModel.OpenLogFolderCommand}"/>
                 </StackPanel>
                 <TextBlock Text="查看应用程序运行日志以便排查问题"
                            Style="{StaticResource CaptionTextBlockStyle}"

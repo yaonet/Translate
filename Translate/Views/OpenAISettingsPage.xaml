@@ -17,18 +17,19 @@
                 <TextBlock Text="API Key" Style="{StaticResource CaptionTextBlockStyle}"/>
                 <PasswordBox x:Name="OpenAIApiKeyBox"
                              PlaceholderText="Enter your OpenAI API key"
+                             Password="{x:Bind ViewModel.OpenAIApiKey, Mode=TwoWay}"
                              PasswordChanged="OpenAIApiKeyBox_PasswordChanged"/>
             </StackPanel>
             
             <StackPanel Spacing="4">
                 <TextBlock Text="Base URL" Style="{StaticResource CaptionTextBlockStyle}"/>
-                <TextBox x:Name="OpenAIBaseUrlTextBox"
+                <TextBox Text="{x:Bind ViewModel.OpenAIBaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          PlaceholderText="e.g., https://api.openai.com/v1"/>
             </StackPanel>
             
             <StackPanel Spacing="4">
                 <TextBlock Text="Model" Style="{StaticResource CaptionTextBlockStyle}"/>
-                <TextBox x:Name="OpenAIModelTextBox"
+                <TextBox Text="{x:Bind ViewModel.OpenAIModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          PlaceholderText="e.g., gpt-4o-mini"/>
             </StackPanel>
         </StackPanel>

@@ -9,19 +9,11 @@ namespace Translate.Views;
 /// </summary>
 public sealed partial class OllamaSettingsPage : Page
 {
-    private readonly SettingViewModel _viewModel;
+    public SettingViewModel ViewModel { get; }
 
     public OllamaSettingsPage()
     {
+        ViewModel = App.Current.Services.GetRequiredService<SettingViewModel>();
         InitializeComponent();
-        _viewModel = App.Current.Services.GetRequiredService<SettingViewModel>();
-        
-        // Initialize controls with current values
-        OllamaBaseUrlTextBox.Text = _viewModel.OllamaBaseUrl;
-        OllamaModelTextBox.Text = _viewModel.OllamaModel;
-
-        // Subscribe to TextChanged events for two-way binding
-        OllamaBaseUrlTextBox.TextChanged += (s, e) => _viewModel.OllamaBaseUrl = OllamaBaseUrlTextBox.Text;
-        OllamaModelTextBox.TextChanged += (s, e) => _viewModel.OllamaModel = OllamaModelTextBox.Text;
     }
 }

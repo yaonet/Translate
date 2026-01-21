@@ -15,13 +15,13 @@
             
             <StackPanel Spacing="4">
                 <TextBlock Text="Base URL" Style="{StaticResource CaptionTextBlockStyle}"/>
-                <TextBox x:Name="OllamaBaseUrlTextBox"
+                <TextBox Text="{x:Bind ViewModel.OllamaBaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          PlaceholderText="e.g., http://localhost:11434"/>
             </StackPanel>
             
             <StackPanel Spacing="4">
                 <TextBlock Text="Model" Style="{StaticResource CaptionTextBlockStyle}"/>
-                <TextBox x:Name="OllamaModelTextBox"
+                <TextBox Text="{x:Bind ViewModel.OllamaModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          PlaceholderText="e.g., translategemma"/>
             </StackPanel>
         </StackPanel>

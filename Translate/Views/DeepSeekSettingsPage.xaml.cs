@@ -10,28 +10,22 @@ namespace Translate.Views;
 /// </summary>
 public sealed partial class DeepSeekSettingsPage : Page
 {
-    private readonly SettingViewModel _viewModel;
+    public SettingViewModel ViewModel { get; }
 
     public DeepSeekSettingsPage()
     {
+        ViewModel = App.Current.Services.GetRequiredService<SettingViewModel>();
         InitializeComponent();
-        _viewModel = App.Current.Services.GetRequiredService<SettingViewModel>();
-        
-        // Initialize controls with current values
-        DeepSeekApiKeyBox.Password = _viewModel.DeepSeekApiKey;
-        DeepSeekBaseUrlTextBox.Text = _viewModel.DeepSeekBaseUrl;
-        DeepSeekModelTextBox.Text = _viewModel.DeepSeekModel;
 
-        // Subscribe to TextChanged events for two-way binding
-        DeepSeekBaseUrlTextBox.TextChanged += (s, e) => _viewModel.DeepSeekBaseUrl = DeepSeekBaseUrlTextBox.Text;
-        DeepSeekModelTextBox.TextChanged += (s, e) => _viewModel.DeepSeekModel = DeepSeekModelTextBox.Text;
+        // Initialize controls with current valuese (PasswordBox doesn't support direct binding in WinUI)
+        DeepSeekApiKeyBox.Password = ViewModel.DeepSeekApiKey;
     }
 
     private void DeepSeekApiKeyBox_PasswordChanged(object sender, RoutedEventArgs e)
     {
         if (sender is PasswordBox passwordBox)
         {
-            _viewModel.DeepSeekApiKey = passwordBox.Password;
+            ViewModel.DeepSeekApiKey = passwordBox.Password;
         }
     }
 }

@@ -102,6 +102,7 @@ namespace Translate
             services.AddTransient<MainViewModel>();
             services.AddTransient<SettingViewModel>();
             services.AddTransient<HistoryViewModel>();
+            services.AddTransient<GeneralSettingsViewModel>();
 
             return services.BuildServiceProvider();
         }

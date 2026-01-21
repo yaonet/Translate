@@ -17,18 +17,19 @@
                 <TextBlock Text="API Key" Style="{StaticResource CaptionTextBlockStyle}"/>
                 <PasswordBox x:Name="GeminiApiKeyBox"
                              PlaceholderText="Enter your Gemini API key"
+                             Password="{x:Bind ViewModel.GeminiApiKey, Mode=TwoWay}"
                              PasswordChanged="GeminiApiKeyBox_PasswordChanged"/>
             </StackPanel>
             
             <StackPanel Spacing="4">
                 <TextBlock Text="Base URL" Style="{StaticResource CaptionTextBlockStyle}"/>
-                <TextBox x:Name="GeminiBaseUrlTextBox"
+                <TextBox Text="{x:Bind ViewModel.GeminiBaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          PlaceholderText="e.g., https://generativelanguage.googleapis.com"/>
             </StackPanel>
             
             <StackPanel Spacing="4">
                 <TextBlock Text="Model" Style="{StaticResource CaptionTextBlockStyle}"/>
-                <TextBox x:Name="GeminiModelTextBox"
+                <TextBox Text="{x:Bind ViewModel.GeminiModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          PlaceholderText="e.g., gemini-flash-latest"/>
             </StackPanel>
         </StackPanel>

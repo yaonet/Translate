@@ -7,17 +7,9 @@ using Translate.Services;
 
 namespace Translate.ViewModels
 {
-    public partial class HistoryViewModel : ObservableObject
+    public partial class HistoryViewModel(HistoryService historyService) : ObservableObject
     {
-        private readonly HistoryService _historyService;
-
-        public HistoryViewModel(HistoryService historyService)
-        {
-            _historyService = historyService;
-            HistoryItems = new ObservableCollection<TranslationHistoryItem>();
-        }
-
-        public ObservableCollection<TranslationHistoryItem> HistoryItems { get; }
+        public ObservableCollection<TranslationHistoryItem> HistoryItems { get; } = [];
 
         [ObservableProperty]
         public partial bool IsLoading { get; set; }
@@ -28,7 +20,7 @@ namespace Translate.ViewModels
             IsLoading = true;
             try
             {
-                var items = await _historyService.GetAllAsync();
+                var items = await historyService.GetAllAsync();
                 HistoryItems.Clear();
                 foreach (var item in items)
                 {
@@ -46,14 +38,14 @@ namespace Translate.ViewModels
         {
             if (item == null) return;
 
-            await _historyService.DeleteAsync(item.Id);
+            await historyService.DeleteAsync(item.Id);
             HistoryItems.Remove(item);
         }
 
         [RelayCommand]
         private async Task ClearAllAsync()
         {
-            await _historyService.ClearAllAsync();
+            await historyService.ClearAllAsync();
             HistoryItems.Clear();
         }
     }

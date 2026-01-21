@@ -10,28 +10,22 @@ namespace Translate.Views;
 /// </summary>
 public sealed partial class OpenAISettingsPage : Page
 {
-    private readonly SettingViewModel _viewModel;
+    public SettingViewModel ViewModel { get; }
 
     public OpenAISettingsPage()
     {
+        ViewModel = App.Current.Services.GetRequiredService<SettingViewModel>();
         InitializeComponent();
-        _viewModel = App.Current.Services.GetRequiredService<SettingViewModel>();
-        
-        // Initialize controls with current values
-        OpenAIApiKeyBox.Password = _viewModel.OpenAIApiKey;
-        OpenAIBaseUrlTextBox.Text = _viewModel.OpenAIBaseUrl;
-        OpenAIModelTextBox.Text = _viewModel.OpenAIModel;
 
-        // Subscribe to TextChanged events for two-way binding
-        OpenAIBaseUrlTextBox.TextChanged += (s, e) => _viewModel.OpenAIBaseUrl = OpenAIBaseUrlTextBox.Text;
-        OpenAIModelTextBox.TextChanged += (s, e) => _viewModel.OpenAIModel = OpenAIModelTextBox.Text;
+        // Initialize controls with current valuese (PasswordBox doesn't support direct binding in WinUI)
+        OpenAIApiKeyBox.Password = ViewModel.OpenAIApiKey;
     }
 
     private void OpenAIApiKeyBox_PasswordChanged(object sender, RoutedEventArgs e)
     {
         if (sender is PasswordBox passwordBox)
         {
-            _viewModel.OpenAIApiKey = passwordBox.Password;
+            ViewModel.OpenAIApiKey = passwordBox.Password;
         }
     }
 }

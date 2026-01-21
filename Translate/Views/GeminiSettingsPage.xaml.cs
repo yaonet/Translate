@@ -10,28 +10,22 @@ namespace Translate.Views;
 /// </summary>
 public sealed partial class GeminiSettingsPage : Page
 {
-    private readonly SettingViewModel _viewModel;
+    public SettingViewModel ViewModel { get; }
 
     public GeminiSettingsPage()
     {
+        ViewModel = App.Current.Services.GetRequiredService<SettingViewModel>();
         InitializeComponent();
-        _viewModel = App.Current.Services.GetRequiredService<SettingViewModel>();
 
-        // Initialize controls with current values
-        GeminiApiKeyBox.Password = _viewModel.GeminiApiKey;
-        GeminiBaseUrlTextBox.Text = _viewModel.GeminiBaseUrl;
-        GeminiModelTextBox.Text = _viewModel.GeminiModel;
-
-        // Subscribe to TextChanged events for two-way binding
-        GeminiBaseUrlTextBox.TextChanged += (s, e) => _viewModel.GeminiBaseUrl = GeminiBaseUrlTextBox.Text;
-        GeminiModelTextBox.TextChanged += (s, e) => _viewModel.GeminiModel = GeminiModelTextBox.Text;
+        // Initialize PasswordBox with current value (PasswordBox doesn't support direct binding in WinUI)
+        GeminiApiKeyBox.Password = ViewModel.GeminiApiKey;
     }
 
     private void GeminiApiKeyBox_PasswordChanged(object sender, RoutedEventArgs e)
     {
         if (sender is PasswordBox passwordBox)
         {
-            _viewModel.GeminiApiKey = passwordBox.Password;
+            ViewModel.GeminiApiKey = passwordBox.Password;
         }
     }
 }
